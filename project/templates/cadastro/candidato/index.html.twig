@@ -1,20 +1,62 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello Cadastro/CandidatoController!{% endblock %}
+{% block title %}Gestão de Candidatos{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Candidatos Cadastrados</h1>
+        <a href="{{ path('app_cadastro_candidato_new') }}" class="btn btn-success">
+            Novo Candidato
+        </a>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/Urna-Simulator/project/src/Controller/Cadastro/CandidatoController.php</code></li>
-        <li>Your template at <code>D:/Urna-Simulator/project/templates/cadastro/candidato/index.html.twig</code></li>
-    </ul>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Número</th>
+                            <th>Nome</th>
+                            <th>Partido</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for candidato in candidatos %}
+                        <tr>
+                            <td>{{ candidato.id }}</td>
+                            <td><strong>{{ candidato.numero }}</strong></td>
+                            <td>{{ candidato.nome }}</td>
+                            <td>{{ candidato.partido ? candidato.partido.nome : 'N/A' }}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ path('app_cadastro_candidato_edit', {'id': candidato.id}) }}" class="btn btn-primary">Editar</a>
+                                    <form method="post" action="{{ path('app_cadastro_candidato_delete', {'id': candidato.id}) }}" onsubmit="return confirm('Tem certeza que deseja excluir este candidato?');" style="display: inline-block;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ candidato.id) }}">
+                                        <button class="btn btn-danger">Excluir</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Nenhum candidato encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

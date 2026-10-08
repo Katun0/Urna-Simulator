@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Urna Eletrônica - Simulação</title>
+{% extends 'base.html.twig' %}
+
+{% block title %}Urna Eletrônica - Simulação{% endblock %}
+
+{% block body %}
     <style>
         :root {
             --body-gray: #777777;
@@ -16,26 +15,25 @@
             --blank-white: #eeeeee;
         }
 
-        body {
+        .urna-wrapper {
             background-color: #e0e0e0;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            padding: 20px 0;
         }
 
         .urna-container {
-            width: 1200px;
+            width: 1000px;
             max-width: 95vw;
-            height: 700px;
+            height: 600px;
             background-color: var(--body-gray);
             border-radius: 15px;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             display: flex;
-            gap: 40px;
+            gap: 30px;
             box-sizing: border-box;
             border: 2px solid #555;
             position: relative;
@@ -56,7 +54,7 @@
             flex: 1;
             background-color: var(--screen-bg);
             color: #fff;
-            padding: 30px;
+            padding: 20px;
             position: relative;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
             overflow: hidden;
@@ -64,118 +62,73 @@
             flex-direction: column;
         }
 
-        .screen-header {
-            margin-bottom: 20px;
-        }
+        .screen-header h1 { font-size: 20px; margin: 0; text-transform: uppercase; }
+        .screen-header h2 { font-size: 16px; margin: 5px 0; color: #aaa; }
+        .screen-header h3 { font-size: 24px; margin: 0; color: #fff; }
 
-        .screen-header h1 {
-            font-size: 24px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .screen-header h2 {
-            font-size: 18px;
-            margin: 10px 0 5px 0;
-            color: #aaa;
-        }
-
-        .screen-header h3 {
-            font-size: 28px;
-            margin: 0;
-            color: #fff;
-        }
-
-        .number-input-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 30px 0;
-        }
-
-        .number-label {
-            font-size: 20px;
-            margin-right: 10px;
-        }
+        .number-input-area { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
+        .number-label { font-size: 18px; }
 
         .digit-box {
-            width: 50px;
-            height: 60px;
+            width: 40px;
+            height: 50px;
             border: 2px solid #555;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 40px;
+            font-size: 32px;
             font-weight: bold;
             font-family: 'Courier New', Courier, monospace;
         }
 
-        .digit-box.active {
-            border-color: #fff;
-            animation: blink 1s infinite;
-        }
+        .digit-box.active { border-color: #fff; animation: blink 1s infinite; }
+        @keyframes blink { 50% { border-color: transparent; } }
 
-        @keyframes blink {
-            50% { border-color: transparent; }
-        }
-
-        .candidate-info {
-            flex: 1;
-            display: none;
-            margin-top: 20px;
-        }
-
-        .info-row {
-            margin-bottom: 10px;
-            font-size: 20px;
-        }
-
+        .candidate-info { flex: 1; display: none; margin-top: 10px; }
+        .info-row { margin-bottom: 5px; font-size: 18px; }
         .info-label { color: #aaa; margin-right: 10px; }
 
         .candidate-photo {
             position: absolute;
-            top: 100px;
-            right: 30px;
-            width: 150px;
-            height: 200px;
+            top: 10px;
+            right: 10px;
+            width: 140px;
+            height: 180px;
             border: 2px solid #555;
             background-color: #222;
             display: flex;
             justify-content: center;
             align-items: center;
             color: #444;
+            overflow: hidden;
         }
 
-        .status-area {
-            border-top: 2px solid #333;
-            padding-top: 15px;
-            font-size: 18px;
-            text-transform: uppercase;
+        .candidate-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
+
+        .status-area { border-top: 2px solid #333; padding-top: 10px; font-size: 16px; text-transform: uppercase; }
 
         /* Keypad Area */
         .keypad-container {
             flex: 4;
             background-color: #444;
-            padding: 30px;
+            padding: 20px;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 20px;
-        }
-
-        .keys-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
 
+        .keys-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .key {
-            height: 70px;
+            height: 55px;
             background-color: #333;
             color: white;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             display: flex;
             justify-content: center;
@@ -187,27 +140,15 @@
             user-select: none;
             transition: all 0.1s;
         }
-
-        .key:hover { background-color: #444; }
-        .key:active {
-            box-shadow: 0 0 #111;
-            transform: translateY(4px);
-        }
-
+        .key:active { box-shadow: 0 0 #111; transform: translateY(4px); }
         .key.zero { grid-column: 2; }
 
-        .action-keys {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
+        .action-keys { display: flex; justify-content: space-between; gap: 8px; margin-top: 15px; }
         .action-key {
             flex: 1;
-            height: 80px;
-            padding: 10px;
-            font-size: 14px;
+            height: 60px;
+            padding: 5px;
+            font-size: 12px;
             font-weight: bold;
             text-transform: uppercase;
             display: flex;
@@ -218,40 +159,18 @@
             box-shadow: 0 4px rgba(0,0,0,0.5);
             transition: all 0.1s;
         }
-
-        .action-key:active {
-            box-shadow: 0 0 transparent;
-            transform: translateY(4px);
-        }
-
+        .action-key:active { box-shadow: 0 0 transparent; transform: translateY(4px); }
         .key-blank { background-color: var(--blank-white); color: #000; }
         .key-correct { background-color: var(--correct-orange); color: #fff; }
         .key-confirm {
             background-color: var(--confirm-green);
             color: #fff;
-            height: 90px;
+            height: 70px;
             margin-top: -10px;
-            font-size: 18px;
+            font-size: 16px;
             box-shadow: 0 4px #1b5e20;
         }
-        .key-confirm:active {
-            box-shadow: 0 0 transparent;
-            transform: translateY(4px);
-        }
 
-        /* Hardware Details */
-        .ventilation {
-            position: absolute;
-            bottom: 20px;
-            right: 40px;
-            width: 100px;
-            height: 20px;
-            display: flex;
-            gap: 5px;
-        }
-        .vent-line { width: 5px; height: 100%; background: rgba(0,0,0,0.2); border-radius: 2px; }
-
-        /* Confirmation Screen */
         .fim-screen {
             position: absolute;
             inset: 0;
@@ -259,99 +178,124 @@
             display: none;
             justify-content: center;
             align-items: center;
-            font-size: 120px;
+            font-size: 100px;
             font-weight: bold;
             letter-spacing: 10px;
             z-index: 10;
+            flex-direction: column;
         }
 
-        @media (max-width: 1000px) {
-            .urna-container {
-                flex-direction: column;
-                width: 95vw;
-                height: auto;
-            }
+        .comprovante-container {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            z-index: 20;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .comprovante-box {
+            border: 2px dashed #000;
+            padding: 20px;
+            width: 80%;
+        }
+
+        @media (max-width: 900px) {
+            .urna-container { flex-direction: column; width: 95vw; height: auto; }
             .screen-container { height: 400px; }
-            .keypad-container { height: auto; }
         }
     </style>
-</head>
-<body>
 
-    <div class="urna-container">
-        <!-- Display Screen -->
-        <div class="screen-container">
-            <div class="screen">
-                <div class="fim-screen" id="fim-screen">FIM</div>
+    <div class="urna-wrapper">
+        <div class="urna-container">
+            <!-- Display Screen -->
+            <div class="screen-container">
+                <div class="screen">
+                    <div class="fim-screen" id="fim-screen">FIM</div>
 
-                <div id="voting-content">
-                    <div class="screen-header">
-                        <h1>SIMULATED ELECTION</h1>
-                        <h2>VOTE FOR</h2>
-                        <h3 id="office-title">CITY COUNCILOR</h3>
-                    </div>
+                    {% if finalizada %}
+                        <div class="fim-screen" style="display: flex; font-size: 40px; text-align: center; padding: 20px;">
+                            ELEIÇÃO ENCERRADA<br>
+                            <span style="font-size: 20px; margin-top: 20px;">Aguarde a apuração oficial.</span>
+                        </div>
+                    {% endif %}
 
-                    <div class="number-input-area">
-                        <span class="number-label">NUMBER:</span>
-                        <div id="digit-container" style="display: flex; gap: 10px;">
-                            <div class="digit-box active"></div>
-                            <div class="digit-box"></div>
-                            <div class="digit-box"></div>
-                            <div class="digit-box"></div>
-                            <div class="digit-box"></div>
+                    <div class="comprovante-container" id="comprovante-container">
+                        <div class="comprovante-box">
+                            <h4 class="mb-3">COMPROVANTE DE VOTAÇÃO</h4>
+                            <p>Eleição Simulada 2026</p>
+                            <hr>
+                            <p><strong>Autenticação:</strong><br><span id="comp-auth"></span></p>
+                            <p><strong>Data/Hora:</strong><br><span id="comp-date"></span></p>
+                            <hr>
+                            <p class="small">O voto é secreto e sua escolha não consta neste documento.</p>
+                            <button class="btn btn-sm btn-dark mt-3" onclick="location.reload()">NOVA VOTAÇÃO</button>
                         </div>
                     </div>
 
-                    <div class="candidate-info" id="candidate-info">
-                        <div class="info-row"><span class="info-label">CANDIDATE:</span> <span id="candidate-name"></span></div>
-                        <div class="info-row"><span class="info-label">PARTY:</span> <span id="candidate-party"></span></div>
-                        <div class="candidate-photo">PHOTO</div>
-                    </div>
+                    <div id="voting-content">
+                        <div class="screen-header">
+                            <h1>ELEIÇÃO SIMULADA</h1>
+                            <h2>SEU VOTO PARA</h2>
+                            <h3 id="office-title">PRESIDENTE</h3>
+                        </div>
 
-                    <div style="flex: 1;"></div>
+                        <div class="number-input-area">
+                            <span class="number-label">NÚMERO:</span>
+                            <div id="digit-container" style="display: flex; gap: 10px;">
+                                <div class="digit-box active"></div>
+                                <div class="digit-box"></div>
+                            </div>
+                        </div>
 
-                    <div class="status-area" id="status-area">
-                        Enter the candidate number
+                        <div class="candidate-info" id="candidate-info">
+                            <div class="candidate-photo" id="candidate-photo-box">FOTO</div>
+                            <div class="info-row"><span class="info-label">CANDIDATO:</span> <span id="candidate-name"></span></div>
+                            <div class="info-row"><span class="info-label">PARTIDO:</span> <span id="candidate-party"></span></div>
+                        </div>
+
+                        <div style="flex: 1;"></div>
+
+                        <div class="status-area" id="status-area">
+                            Digite o número do candidato
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Keypad -->
-        <div class="keypad-container">
-            <div class="keys-grid">
-                <div class="key" onclick="pressKey('1')">1</div>
-                <div class="key" onclick="pressKey('2')">2</div>
-                <div class="key" onclick="pressKey('3')">3</div>
-                <div class="key" onclick="pressKey('4')">4</div>
-                <div class="key" onclick="pressKey('5')">5</div>
-                <div class="key" onclick="pressKey('6')">6</div>
-                <div class="key" onclick="pressKey('7')">7</div>
-                <div class="key" onclick="pressKey('8')">8</div>
-                <div class="key" onclick="pressKey('9')">9</div>
-                <div class="key zero" onclick="pressKey('0')">0</div>
+            <!-- Keypad -->
+            <div class="keypad-container">
+                <div class="keys-grid">
+                    <div class="key" onclick="pressKey('1')">1</div>
+                    <div class="key" onclick="pressKey('2')">2</div>
+                    <div class="key" onclick="pressKey('3')">3</div>
+                    <div class="key" onclick="pressKey('4')">4</div>
+                    <div class="key" onclick="pressKey('5')">5</div>
+                    <div class="key" onclick="pressKey('6')">6</div>
+                    <div class="key" onclick="pressKey('7')">7</div>
+                    <div class="key" onclick="pressKey('8')">8</div>
+                    <div class="key" onclick="pressKey('9')">9</div>
+                    <div class="key zero" onclick="pressKey('0')">0</div>
+                </div>
+
+                <div class="action-keys">
+                    <div class="action-key key-blank" onclick="pressBlank()">BRANCO</div>
+                    <div class="action-key key-correct" onclick="pressCorrect()">CORRIGE</div>
+                    <div class="action-key key-confirm" onclick="pressConfirm()">CONFIRMA</div>
+                </div>
             </div>
-
-            <div class="action-keys">
-                <div class="action-key key-blank" onclick="pressBlank()">BLANK</div>
-                <div class="action-key key-correct" onclick="pressCorrect()">CORRECT</div>
-                <div class="action-key key-confirm" onclick="pressConfirm()">CONFIRM</div>
-            </div>
-        </div>
-
-        <!-- Hardware Details -->
-        <div class="ventilation">
-            <div class="vent-line"></div>
-            <div class="vent-line"></div>
-            <div class="vent-line"></div>
-            <div class="vent-line"></div>
-            <div class="vent-line"></div>
         </div>
     </div>
 
     <script>
         let currentNumber = "";
-        const maxDigits = 5; // Default for City Councilor in Brazil
+        const maxDigits = 2;
         let candidates = [];
         let isConfirmed = false;
         let isBlank = false;
@@ -362,11 +306,6 @@
                 candidates = await response.json();
             } catch (error) {
                 console.error("Failed to fetch candidates", error);
-                // Fallback for simulation
-                candidates = [
-                    {numero: "12345", nome: "JOHN DOE", partido: "EXAMPLE PARTY"},
-                    {numero: "54321", nome: "JANE SMITH", partido: "GLOBAL PARTY"}
-                ];
             }
         }
 
@@ -381,35 +320,45 @@
             });
 
             if (isBlank) {
-                statusArea.textContent = "BLANK VOTE - PRESS CONFIRM";
+                statusArea.textContent = "VOTO EM BRANCO - PRESSIONE CONFIRMAR";
                 infoArea.style.display = 'none';
                 return;
             }
 
             if (currentNumber.length === maxDigits) {
-                const candidate = candidates.find(c => c.numero === currentNumber);
+                const candidate = candidates.find(c => String(c.numero) === String(currentNumber));
                 if (candidate) {
                     document.getElementById('candidate-name').textContent = candidate.nome;
                     document.getElementById('candidate-party').textContent = candidate.partido;
+
+                    const photoBox = document.getElementById('candidate-photo-box');
+                    if (candidate.foto) {
+                        photoBox.innerHTML = `<img src="data:image/jpeg;base64,${candidate.foto}" alt="Foto do Candidato">`;
+                    } else {
+                        photoBox.textContent = 'FOTO';
+                    }
+
                     infoArea.style.display = 'block';
-                    statusArea.textContent = "Check the candidate information and press CONFIRM";
+                    statusArea.textContent = "Confira as informações do candidato e pressione CONFIRMAR";
                 } else {
                     infoArea.style.display = 'none';
-                    statusArea.textContent = "Candidate number not found";
+                    statusArea.textContent = "Número de candidato não encontrado";
                 }
             } else {
                 infoArea.style.display = 'none';
-                statusArea.textContent = currentNumber.length > 0 ? "Enter all required digits" : "Enter the candidate number";
+                statusArea.textContent = currentNumber.length > 0 ? "Digite todos os dígitos necessários" : "Digite o número do candidato";
             }
         }
 
         function pressKey(num) {
+            {% if finalizada %} return; {% endif %}
             if (isConfirmed || isBlank || currentNumber.length >= maxDigits) return;
             currentNumber += num;
             updateScreen();
         }
 
         function pressCorrect() {
+            {% if finalizada %} return; {% endif %}
             if (isConfirmed) return;
             currentNumber = "";
             isBlank = false;
@@ -417,27 +366,57 @@
         }
 
         function pressBlank() {
+            {% if finalizada %} return; {% endif %}
             if (isConfirmed) return;
             currentNumber = "";
             isBlank = true;
             updateScreen();
         }
 
-        function pressConfirm() {
+        async function pressConfirm() {
+            {% if finalizada %} return; {% endif %}
             if (isConfirmed) return;
 
-            const candidate = candidates.find(c => c.numero === currentNumber);
-            if (isBlank || (currentNumber.length === maxDigits && candidate)) {
-                isConfirmed = true;
-                document.getElementById('fim-screen').style.display = 'flex';
-                // Reset after 3 seconds for demo
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
+            const candidate = candidates.find(c => String(c.numero) === String(currentNumber));
+            const isNull = !isBlank && currentNumber.length === maxDigits && !candidate;
+
+            if (isBlank || (currentNumber.length === maxDigits)) {
+                try {
+                    const response = await fetch('/api/votar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            numero: isBlank ? null : currentNumber,
+                            isBranco: isBlank
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        isConfirmed = true;
+                        document.getElementById('fim-screen').style.display = 'flex';
+
+                        // Toca som de confirmação se houver (opcional)
+
+                        setTimeout(() => {
+                            document.getElementById('fim-screen').style.display = 'none';
+                            document.getElementById('comp-auth').textContent = result.comprovante;
+                            document.getElementById('comp-date').textContent = result.data;
+                            document.getElementById('comprovante-container').style.display = 'flex';
+                        }, 2000);
+                    } else {
+                        alert(result.error || 'Erro ao processar voto.');
+                    }
+                } catch (error) {
+                    console.error("Erro na votação:", error);
+                    alert('Erro de conexão ao enviar voto.');
+                }
             }
         }
 
         fetchCandidates();
     </script>
-</body>
-</html>
+{% endblock %}

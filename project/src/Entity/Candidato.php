@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CandidatoRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CandidatoRepository::class)]
@@ -25,6 +26,14 @@ class Candidato
 
     #[ORM\ManyToOne(inversedBy: 'candidatos')]
     private ?Partido $Partido = null;
+
+    #[ORM\Column(type: Types::BLOB, nullable: true)]
+    private mixed $foto = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getNome(): ?string
     {
@@ -58,6 +67,18 @@ class Candidato
     public function setPartido(?Partido $Partido): static
     {
         $this->Partido = $Partido;
+
+        return $this;
+    }
+
+    public function getFoto(): mixed
+    {
+        return $this->foto;
+    }
+
+    public function setFoto(mixed $foto): static
+    {
+        $this->foto = $foto;
 
         return $this;
     }

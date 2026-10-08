@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Candidato{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Editar Candidato: {{ candidato.nome }}</h3>
+                </div>
+                <div class="card-body">
+                    {% if fotoBase64 %}
+                        <div class="text-center mb-4">
+                            <img src="data:image/jpeg;base64,{{ fotoBase64 }}" alt="Foto atual" class="img-thumbnail" style="max-height: 200px;">
+                            <div class="small text-muted">Foto atual</div>
+                        </div>
+                    {% endif %}
+                    {{ form_start(form) }}
+                        {{ form_widget(form) }}
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-primary btn-lg">Salvar Alterações</button>
+                            <a href="{{ path('app_cadastro_candidato_index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

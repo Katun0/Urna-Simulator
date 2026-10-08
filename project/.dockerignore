@@ -1,0 +1,14 @@
+.git
+var/
+vendor/
+.env.local
+.env.local.php
+.env.*.local
+config/secrets/prod/prod.decrypt.private.php
+public/build
+public/bundles
+node_modules
+dockerfile
+compose.yaml
+compose.override.yaml
+docker/

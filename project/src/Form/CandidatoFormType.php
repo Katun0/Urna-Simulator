@@ -6,6 +6,7 @@ use App\Entity\Candidato;
 use App\Entity\Partido;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,8 +19,13 @@ class CandidatoFormType extends AbstractType
             ->add('Numero')
             ->add('Partido', EntityType::class, [
                 'class' => Partido::class,
-                'choice_label' => 'id',
+                'choice_label' => 'Nome',
             ])
+            ->add('Foto', FileType::class, [
+                'label' => 'Foto',
+                'required' => false,
+                'mapped' => false,
+            ]);
         ;
     }
 

@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\Candidato;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * @extends ServiceEntityRepository<Candidato>
  */

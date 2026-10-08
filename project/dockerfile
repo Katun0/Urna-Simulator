@@ -1,0 +1,43 @@
+# Imagem base do FrankenPHP com PHP 8.4
+FROM dunglas/frankenphp:1.4-php8.4-alpine
+
+# Instalação de dependências do sistema e extensões PHP necessárias para Symfony e PostgreSQL
+RUN apk add --no-cache \
+    acl \
+    file \
+    gettext \
+    git \
+    postgresql-dev \
+    && docker-php-ext-install -j$(nproc) \
+    intl \
+    opcache \
+    pdo_pgsql \
+    zip
+
+# Configurações do PHP
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY --link docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
+
+# Instalação do Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Copia os arquivos do projeto
+COPY --link . .
+
+# Permissões para o Symfony
+RUN set -eux; \
+    mkdir -p var/cache var/log; \
+    chmod -R 777 var;
+
+# Instalação de dependências (sem rodar scripts que dependem de variáveis de ambiente do banco de dados ainda)
+RUN composer install --no-dev --no-scripts --no-progress --optimize-autoloader
+
+# Entrypoint para rodar migrações e iniciar o servidor
+COPY --link docker/entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

@@ -34,12 +34,21 @@ class RegistrationController extends AbstractController
 
             // Set role to Votante by default
             $votanteRole = $customRoleRepository->findOneBy(['name' => 'ROLE_VOTANTE']);
-            $roles = ['ROLE_USER'];
-            if ($votanteRole) {
-                $user->setCustomRole($votanteRole);
-                $roles[] = 'ROLE_VOTANTE';
+
+            if (!$votanteRole) {
+                // If ROLE_VOTANTE doesn't exist, try to find ANY role that has urna access
+                // or just create/use a default one.
+                // Given the instructions, we should ensure the user HAS the role.
+                // For now, let's assume ROLE_VOTANTE is the intended name for voting permission.
+                $votanteRole = new \App\Entity\CustomRole();
+                $votanteRole->setName('ROLE_VOTANTE');
+                $votanteRole->setAllowedRoutes(['urna_interface', 'api_candidatos', 'api_votar']);
+                $entityManager->persist($votanteRole);
+                $entityManager->flush(); // Flush to get ID if needed, though not strictly necessary for association
             }
-            $user->setRoles($roles);
+
+            $user->setCustomRole($votanteRole);
+            $user->setRoles(['ROLE_USER', 'ROLE_VOTANTE']);
 
             $entityManager->persist($user);
             $entityManager->flush();

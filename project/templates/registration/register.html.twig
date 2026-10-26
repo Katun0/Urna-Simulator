@@ -5,31 +5,36 @@
 {% block body %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h1>Cadastro</h1>
-
-            {{ form_errors(registrationForm) }}
-
-            {{ form_start(registrationForm) }}
+        <div class="col-md-7 col-lg-6">
+            {{ form_start(registrationForm, {'attr': {'class': 'auth-form-card'}}) }}
+                <span class="text-uppercase small fw-bold text-success">Cadastro seguro</span>
+                <h1 class="h3 mt-2 mb-4">Criar sua conta</h1>
+                {{ form_errors(registrationForm) }}
                 <div class="mb-3">
                     {{ form_label(registrationForm.Nome, 'Nome Completo', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(registrationForm.Nome, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.Nome) }}
                 </div>
                 <div class="mb-3">
                     {{ form_label(registrationForm.Email, 'E-mail', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(registrationForm.Email, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.Email) }}
                 </div>
                 <div class="mb-3">
                     {{ form_label(registrationForm.Idade, 'Idade', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(registrationForm.Idade, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.Idade) }}
                 </div>
                 <div class="mb-3">
                     {{ form_label(registrationForm.TituloEleitor, 'Título de Eleitor', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(registrationForm.TituloEleitor, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.TituloEleitor) }}
                 </div>
                 <div class="mb-3">
                     {{ form_label(registrationForm.plainPassword, 'Senha', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                    <div class="form-text">Use pelo menos 12 caracteres.</div>
+                    {{ form_errors(registrationForm.plainPassword) }}
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">Cadastrar</button>

@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Entrar · Urna Eletrônica{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <form method="post">
+        <div class="col-md-6 col-lg-5">
+            <form method="post" class="login-card">
                 {% if error %}
                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
@@ -17,7 +17,9 @@
                     </div>
                 {% endif %}
 
-                <h1 class="h3 mb-3 font-weight-normal">Por favor, faça o login</h1>
+                <span class="text-uppercase small fw-bold text-success">Acesso seguro</span>
+                <h1 class="h3 mt-2 mb-1">Bem-vindo de volta</h1>
+                <p class="text-secondary mb-4">Entre com seus dados para continuar.</p>
 
                 <div class="mb-3">
                     <label for="inputTituloEleitor" class="form-label">Título de Eleitor</label>

@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class CustomRoleFormType extends AbstractType
 {
@@ -34,6 +37,11 @@ class CustomRoleFormType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nome da Role (ex: ROLE_MODERADOR)',
+                'constraints' => [
+                    new NotBlank(),
+                    new Length(max: 100),
+                    new Regex(pattern: '/^ROLE_[A-Z][A-Z0-9_]*$/', message: 'Use um identificador no formato ROLE_NOME.'),
+                ],
             ])
             ->add('routes', ChoiceType::class, [
                 'label' => 'Rotas Permitidas',

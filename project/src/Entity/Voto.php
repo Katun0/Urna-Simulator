@@ -17,15 +17,14 @@ class Voto
     #[ORM\JoinColumn(nullable: true)]
     private ?Candidato $candidato = null;
 
-    #[ORM\ManyToOne(targetEntity: Usuario::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Usuario $usuario = null;
-
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $dataVoto = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 64, unique: true)]
     private ?string $codigoAutenticacao = null;
+
+    #[ORM\Column(length: 32)]
+    private ?string $codigoAutenticacaoSalt = null;
 
     #[ORM\Column]
     private ?bool $isBranco = false;
@@ -33,7 +32,6 @@ class Voto
     public function __construct()
     {
         $this->dataVoto = new \DateTimeImmutable();
-        $this->codigoAutenticacao = bin2hex(random_bytes(16));
     }
 
     public function getId(): ?int
@@ -52,17 +50,6 @@ class Voto
         return $this;
     }
 
-    public function getUsuario(): ?Usuario
-    {
-        return $this->usuario;
-    }
-
-    public function setUsuario(?Usuario $usuario): static
-    {
-        $this->usuario = $usuario;
-        return $this;
-    }
-
     public function getDataVoto(): ?\DateTimeImmutable
     {
         return $this->dataVoto;
@@ -71,6 +58,25 @@ class Voto
     public function getCodigoAutenticacao(): ?string
     {
         return $this->codigoAutenticacao;
+    }
+
+    public function setCodigoAutenticacao(string $codigoAutenticacao): static
+    {
+        $this->codigoAutenticacao = $codigoAutenticacao;
+
+        return $this;
+    }
+
+    public function getCodigoAutenticacaoSalt(): ?string
+    {
+        return $this->codigoAutenticacaoSalt;
+    }
+
+    public function setCodigoAutenticacaoSalt(string $codigoAutenticacaoSalt): static
+    {
+        $this->codigoAutenticacaoSalt = $codigoAutenticacaoSalt;
+
+        return $this;
     }
 
     public function isBranco(): ?bool

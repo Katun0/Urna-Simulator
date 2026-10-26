@@ -29,6 +29,9 @@ security:
                 username_parameter: _titulo_eleitor
                 password_parameter: _password
                 default_target_path: urna_interface
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -41,6 +44,7 @@ security:
         - { path: ^/cadastro/role, roles: ROLE_ADMIN }
         - { path: ^/cadastro, roles: ROLE_ADMIN }
         - { path: ^/urna, roles: [ROLE_VOTANTE, DYNAMIC_ROUTE_ACCESS] }
+        - { path: ^/api/votar$, roles: ROLE_VOTANTE }
         - { path: ^/api/candidatos, roles: [ROLE_VOTANTE, DYNAMIC_ROUTE_ACCESS] }
         - { path: ^/, roles: [ROLE_USER, DYNAMIC_ROUTE_ACCESS] }
 

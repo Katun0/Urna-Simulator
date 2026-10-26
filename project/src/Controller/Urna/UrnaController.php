@@ -3,11 +3,15 @@
 namespace App\Controller\Urna;
 
 use App\Entity\Configuracao;
+use App\Entity\ParticipacaoVoto;
 use App\Entity\Voto;
 use App\Repository\CandidatoRepository;
 use App\Repository\ConfiguracaoRepository;
+use App\Repository\ParticipacaoVotoRepository;
 use App\Repository\VotoRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use App\Service\VoteReceiptService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,31 +65,46 @@ class UrnaController extends AbstractController
         Request $request,
         CandidatoRepository $candidatoRepository,
         EntityManagerInterface $entityManager,
-        VotoRepository $votoRepository,
-        ConfiguracaoRepository $configRepository
+        ParticipacaoVotoRepository $participacaoRepository,
+        ConfiguracaoRepository $configRepository,
+        VoteReceiptService $receiptService
     ): JsonResponse {
-        $config = $configRepository->findOneBy([]);
-        if ($config && $config->isEleicaoFinalizada()) {
-            return new JsonResponse(['error' => 'A eleição já foi encerrada.'], Response::HTTP_FORBIDDEN);
-        }
-
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Usuário não autenticado'], Response::HTTP_UNAUTHORIZED);
         }
 
+        if (!$this->isCsrfTokenValid('api_votar', $request->headers->get('X-CSRF-Token'))) {
+            return new JsonResponse(['error' => 'Token de segurança inválido. Atualize a página e tente novamente.'], Response::HTTP_FORBIDDEN);
+        }
+
+        $config = $configRepository->findOneBy([]);
+        if ($config && $config->isEleicaoFinalizada()) {
+            return new JsonResponse(['error' => 'A eleição já foi encerrada.'], Response::HTTP_FORBIDDEN);
+        }
+
         // Verifica se o usuário já votou
-        $votoExistente = $votoRepository->findOneBy(['usuario' => $user]);
-        if ($votoExistente) {
+        if ($participacaoRepository->findOneBy(['usuario' => $user])) {
             return new JsonResponse(['error' => 'Você já realizou seu voto.'], Response::HTTP_FORBIDDEN);
         }
 
-        $data = json_decode($request->getContent(), true);
+        try {
+            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return new JsonResponse(['error' => 'Requisição inválida.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!is_array($data) || !is_bool($data['isBranco'] ?? null)) {
+            return new JsonResponse(['error' => 'Dados do voto inválidos.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $isBranco = $data['isBranco'];
         $numero = $data['numero'] ?? null;
-        $isBranco = $data['isBranco'] ?? false;
+        if (!$isBranco && (!is_string($numero) || !preg_match('/^\d{2}$/D', $numero))) {
+            return new JsonResponse(['error' => 'Informe um número de candidato válido.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         $voto = new Voto();
-        $voto->setUsuario($user);
         $voto->setIsBranco($isBranco);
 
         if (!$isBranco) {
@@ -98,12 +117,21 @@ class UrnaController extends AbstractController
             }
         }
 
+        $participacao = new ParticipacaoVoto();
+        $participacao->setUsuario($user);
+        $comprovante = $receiptService->issue($voto);
+        $entityManager->persist($participacao);
         $entityManager->persist($voto);
-        $entityManager->flush();
+
+        try {
+            $entityManager->flush();
+        } catch (UniqueConstraintViolationException) {
+            return new JsonResponse(['error' => 'Você já realizou seu voto.'], Response::HTTP_FORBIDDEN);
+        }
 
         return new JsonResponse([
             'success' => true,
-            'comprovante' => $voto->getCodigoAutenticacao(),
+            'comprovante' => $comprovante,
             'data' => $voto->getDataVoto()->format('d/m/Y H:i:s')
         ]);
     }
@@ -154,9 +182,14 @@ class UrnaController extends AbstractController
     }
 
     #[Route('/urna/finalizar', name: 'urna_finalizar', methods: ['POST'])]
-    public function finalizar(ConfiguracaoRepository $configRepository, EntityManagerInterface $entityManager): Response
+    public function finalizar(Request $request, ConfiguracaoRepository $configRepository, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $csrfToken = $request->request->get('_token');
+        if (!is_string($csrfToken) || !$this->isCsrfTokenValid('urna_finalizar', $csrfToken)) {
+            throw $this->createAccessDeniedException('Token de segurança inválido. Atualize a página e tente novamente.');
+        }
 
         $config = $configRepository->findOneBy([]);
         if (!$config) {

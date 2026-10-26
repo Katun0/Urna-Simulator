@@ -95,6 +95,7 @@
 
         {% if is_granted('ROLE_ADMIN') and not finalizada %}
             <form action="{{ path('urna_finalizar') }}" method="POST" onsubmit="return confirm('Tem certeza que deseja encerrar a eleição? Esta ação não pode ser desfeita.')">
+                <input type="hidden" name="_token" value="{{ csrf_token('urna_finalizar') }}">
                 <button type="submit" class="btn btn-danger">Encerrar Eleição</button>
             </form>
         {% endif %}

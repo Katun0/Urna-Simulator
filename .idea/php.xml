@@ -141,6 +141,7 @@
       <path value="$PROJECT_DIR$/project/vendor/phpstan/phpdoc-parser" />
       <path value="$PROJECT_DIR$/project/vendor/twig/extra-bundle" />
       <path value="$PROJECT_DIR$/project/vendor/theseer/tokenizer" />
+      <path value="$PROJECT_DIR$/project/vendor/symfony/rate-limiter" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4" />

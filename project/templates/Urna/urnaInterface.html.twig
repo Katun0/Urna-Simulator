@@ -5,19 +5,19 @@
 {% block body %}
     <style>
         :root {
-            --body-gray: #777777;
+            --body-gray: #dce2e5;
             --internal-gray: #666666;
             --screen-bg: #111111;
             --key-gray: #d0d0d0;
             --key-text: #111111;
-            --confirm-green: #388e3c;
-            --correct-orange: #f57c00;
+            --confirm-green: #198754;
+            --correct-orange: #ed8a32;
             --blank-white: #eeeeee;
         }
 
         .urna-wrapper {
             background-color: transparent;
-            font-family: 'Arial', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,9 +30,9 @@
             max-width: 95vw;
             height: 600px;
             background-color: var(--body-gray);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 28px 70px rgba(25, 42, 47, .22), inset 0 1px rgba(255,255,255,.8);
             display: flex;
             gap: 30px;
             box-sizing: border-box;
@@ -45,7 +45,7 @@
             flex: 6;
             background-color: #333;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 12px;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
@@ -117,7 +117,7 @@
             flex: 4;
             background-color: #444;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -134,9 +134,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 5px;
+            border-radius: 9px;
             cursor: pointer;
-            border: 1px solid #222;
+            border: 1px solid rgba(255,255,255,.08);
             box-shadow: 0 4px #111;
             user-select: none;
             transition: all 0.1s;
@@ -208,12 +208,12 @@
         }
 
         @media (max-width: 900px) {
-            .urna-container { flex-direction: column; width: 95vw; height: auto; }
+            .urna-container { flex-direction: column; width: min(620px, 95vw); height: auto; }
             .screen-container { height: 400px; }
         }
     </style>
 
-    <div class="urna-wrapper">
+    <div class="urna-wrapper" data-vote-csrf="{{ csrf_token('api_votar') }}">
         <div class="urna-container">
             <!-- Display Screen -->
             <div class="screen-container">
@@ -233,6 +233,7 @@
                             <p>Eleição Simulada 2026</p>
                             <hr>
                             <p><strong>Autenticação:</strong><br><span id="comp-auth"></span></p>
+                            <p class="small">Guarde esta chave: ela não poderá ser recuperada após sair desta tela.</p>
                             <p><strong>Data/Hora:</strong><br><span id="comp-date"></span></p>
                             <hr>
                             <p class="small">O voto é secreto e sua escolha não consta neste documento.</p>
@@ -387,6 +388,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'X-CSRF-Token': document.querySelector('.urna-wrapper').dataset.voteCsrf,
                         },
                         body: JSON.stringify({
                             numero: isBlank ? null : currentNumber,
